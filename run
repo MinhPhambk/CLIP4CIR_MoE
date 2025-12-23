@@ -1,0 +1,93 @@
+/home/awake-dev/code/test_only/code/context-cir/src/data/CIRR/cirr/img_raw
+
+python src/clip_fine_tune.py \
+   --dataset CIRR \
+   --num-epochs 100 \
+   --clip-model-name RN50x16 \
+   --encoder both \
+   --learning-rate 2e-6 \
+   --batch-size 128 \
+   --transform targetpad \
+   --target-ratio 1.25 \
+   --save-training \
+   --save-best \
+   --validation-frequency 1
+
+python src/clip_fine_tune.py \
+   --dataset FashionIQ \
+   --num-epochs 100 \
+   --clip-model-name RN50x16 \
+   --encoder both \
+   --learning-rate 2e-6 \
+   --batch-size 64 \
+   --transform targetpad \
+   --target-ratio 1.25 \
+   --save-training \
+   --save-best \
+   --validation-frequency 1
+
+python src/combiner_train.py \
+   --dataset CIRR \
+   --projection-dim 2560 \
+   --hidden-dim 5120 \
+   --num-epochs 300 \
+   --clip-model-name RN50x16 \
+   --clip-model-path /home/awake-dev/code/test_only/code/CLIP4Cir/models/clip_finetuned_on_cirr_RN50x16_2025-12-16_16:54:01/saved_models/tuned_clip_geometric.pt \
+   --combiner-lr 2e-5 \
+   --batch-size 4096 \
+   --clip-bs 32 \
+   --transform targetpad \
+   --target-ratio 1.25 \
+   --save-training \
+   --save-best \
+   --validation-frequency 1
+
+python src/combiner_train.py \
+   --dataset FashionIQ \
+   --projection-dim 2560 \
+   --hidden-dim 5120 \
+   --num-epochs 300 \
+   --clip-model-name RN50x16 \
+   --clip-model-path /home/awake-dev/code/test_only/code/CLIP4Cir/models/clip_finetuned_on_fiq_RN50x16_2025-12-21_04:19:57/saved_models/tuned_clip_best.pt \
+   --combiner-lr 2e-5 \
+   --batch-size 2048 \
+   --clip-bs 32 \
+   --transform targetpad \
+   --target-ratio 1.25 \
+   --save-training \
+   --save-best \
+   --validation-frequency 1
+
+python src/cirr_test_submission.py \
+   --submission-name my_submission \
+   --combining-function combiner \
+   --combiner-path /home/awake-dev/code/test_only/code/CLIP4Cir/models/combiner_trained_on_cirr_RN50x16_2025-12-22_02:45:49/saved_models/combiner_arithmetic.pt \
+   --projection-dim 2560 \
+   --hidden-dim 5120 \
+   --clip-model-name RN50x16 \
+   --clip-model-path /home/awake-dev/code/test_only/code/CLIP4Cir/models/clip_finetuned_on_cirr_RN50x16_2025-12-16_16:54:01/saved_models/tuned_clip_arithmetic.pt \
+   --target-ratio 1.25 \
+   --transform targetpad
+
+python src/validate_test.py \
+   --dataset FashionIQ \
+   --split test \
+   --clip-model-name RN50x16 \
+   --combining-function combiner \
+   --projection-dim 2560 \
+   --hidden-dim 5120 \
+   --target-ratio 1.25 \
+   --transform targetpad \
+   --combiner-path /home/awake-dev/code/test_only/code/CLIP4Cir/models/combiner_trained_on_fiq_RN50x16_2025-12-21_05:11:27/saved_models/combiner.pt \
+   --clip-model-path /home/awake-dev/code/test_only/code/CLIP4Cir/models/clip_finetuned_on_fiq_RN50x16_2025-12-21_04:19:57/saved_models/tuned_clip_best.pt
+
+python src/validate.py \
+   --dataset FashionIQ \
+   --combining-function combiner \
+   --projection-dim 2560 \
+   --hidden-dim 5120 \
+   --clip-model-name RN50x16 \
+   --target-ratio 1.25 \
+   --transform targetpad \
+   --combiner-path /home/awake-dev/code/test_only/code/CLIP4Cir/models/combiner_trained_on_fiq_RN50x16_2025-12-22_03:15:19/saved_models/combiner.pt \
+   --clip-model-path /home/awake-dev/code/test_only/code/CLIP4Cir/models/clip_finetuned_on_fiq_RN50x16_2025-12-21_04:19:57/saved_models/tuned_clip_best.pt
